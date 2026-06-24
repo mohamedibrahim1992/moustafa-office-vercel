@@ -1,0 +1,14 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "pAQJO4C0CNuv6cotVMx5q"
+uri = "file://project-export.tar.gz"
+type = "unspecified"
+title = "مشروع مكتب مصطفى حمزة - نسخة كاملة"
+
+[[outputs]]
+id = "BSYXB8LHreiuAwRnppsRI"
+uri = "file://project-prompt.txt"
+type = "text"
+title = "مشروع مكتب مصطفى حمزة - وصف/برومبت المشروع"

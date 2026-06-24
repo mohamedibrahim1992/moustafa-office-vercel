@@ -1,0 +1,802 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.3.0
+  description: مكتب مصطفى حمزة - Accounting Office API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+  - name: auth
+  - name: clients
+  - name: invoices
+  - name: expenses
+  - name: reports
+  - name: commands
+  - name: declarations
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+
+  /auth/users:
+    get:
+      operationId: listAuthUsers
+      tags: [auth]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PublicUser" }
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "401":
+          description: Invalid
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      responses:
+        "204":
+          description: OK
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "401":
+          description: Not authenticated
+
+  /clients:
+    get:
+      operationId: listClients
+      tags: [clients]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Client" }
+    post:
+      operationId: createClient
+      tags: [clients]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateClientInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Client" }
+  /clients/{id}:
+    patch:
+      operationId: updateClient
+      tags: [clients]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateClientInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Client" }
+    delete:
+      operationId: deleteClient
+      tags: [clients]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: OK
+  /clients/check-duplicates:
+    post:
+      operationId: checkClientDuplicates
+      tags: [clients]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CheckClientDuplicatesInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CheckClientDuplicatesResult" }
+
+  /clients/import:
+    post:
+      operationId: importClients
+      tags: [clients]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ImportClientsInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ImportClientsResult" }
+
+  /invoices:
+    get:
+      operationId: listInvoices
+      tags: [invoices]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Invoice" }
+    post:
+      operationId: createInvoice
+      tags: [invoices]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateInvoiceInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+  /invoices/{id}:
+    patch:
+      operationId: updateInvoice
+      tags: [invoices]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UpdateInvoiceInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Invoice" }
+    delete:
+      operationId: deleteInvoice
+      tags: [invoices]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: OK
+
+  /expenses:
+    get:
+      operationId: listExpenses
+      tags: [expenses]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Expense" }
+    post:
+      operationId: createExpense
+      tags: [expenses]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateExpenseInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Expense" }
+  /expenses/{id}:
+    delete:
+      operationId: deleteExpense
+      tags: [expenses]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: OK
+
+  /reports:
+    get:
+      operationId: listReports
+      tags: [reports]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Report" }
+    post:
+      operationId: createReport
+      tags: [reports]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateReportInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Report" }
+  /reports/{id}:
+    delete:
+      operationId: deleteReport
+      tags: [reports]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: OK
+
+  /commands:
+    get:
+      operationId: listCommands
+      tags: [commands]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Command" }
+    post:
+      operationId: createCommand
+      tags: [commands]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateCommandInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Command" }
+  /commands/{id}:
+    delete:
+      operationId: deleteCommand
+      tags: [commands]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "204":
+          description: OK
+  /commands/{id}/complete:
+    patch:
+      operationId: toggleCommandComplete
+      tags: [commands]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ToggleCommandCompleteInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Command" }
+  /commands/{id}/flag:
+    patch:
+      operationId: toggleCommandFlag
+      tags: [commands]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ToggleCommandFlagInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Command" }
+  /commands/stats:
+    get:
+      operationId: getCommandStats
+      tags: [commands]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CommandStatsResponse" }
+
+  /declarations:
+    get:
+      operationId: listDeclarations
+      tags: [declarations]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Declaration" }
+  /declarations/toggle:
+    post:
+      operationId: toggleDeclaration
+      tags: [declarations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ToggleDeclarationInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Declaration" }
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      additionalProperties: false
+      required: [status]
+      properties:
+        status: { type: string, enum: [ok] }
+
+    UserRole:
+      type: string
+      enum: [admin, manager, clients, invoices, expenses, reports]
+
+    PublicUser:
+      type: object
+      additionalProperties: false
+      required: [id, name, role, color]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        role: { $ref: "#/components/schemas/UserRole" }
+        color: { type: string }
+
+    User:
+      type: object
+      additionalProperties: false
+      required: [id, name, role, color]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        role: { $ref: "#/components/schemas/UserRole" }
+        color: { type: string }
+
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [userId, password]
+      properties:
+        userId: { type: integer }
+        password: { type: string }
+
+    EntityType:
+      type: string
+      enum: [فردي, شركة]
+
+    VatStatus:
+      type: string
+      enum: [نعم, لا, ربع سنوي]
+
+    Client:
+      type: object
+      additionalProperties: false
+      required: [id, name, createdAt]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        taxNumber: { type: string, nullable: true }
+        entityType: { $ref: "#/components/schemas/EntityType", nullable: true }
+        vatStatus: { $ref: "#/components/schemas/VatStatus", nullable: true }
+        username: { type: string, nullable: true }
+        password: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        phone: { type: string, nullable: true }
+        nationalId: { type: string, nullable: true }
+        eInvoiceEmail: { type: string, nullable: true }
+        eInvoicePassword: { type: string, nullable: true }
+        registrationDate: { type: string, nullable: true }
+        taxCardExpiry: { type: string, nullable: true }
+        taxPortalExpiry: { type: string, nullable: true }
+        tokenExpiry: { type: string, nullable: true }
+        appealCommitteeDate: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        addedByName: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    CreateClientInput:
+      type: object
+      additionalProperties: false
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1 }
+        taxNumber: { type: string, nullable: true }
+        entityType: { $ref: "#/components/schemas/EntityType", nullable: true }
+        vatStatus: { $ref: "#/components/schemas/VatStatus", nullable: true }
+        username: { type: string, nullable: true }
+        password: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        phone: { type: string, nullable: true }
+        nationalId: { type: string, nullable: true }
+        eInvoiceEmail: { type: string, nullable: true }
+        eInvoicePassword: { type: string, nullable: true }
+        registrationDate: { type: string, nullable: true }
+        taxCardExpiry: { type: string, nullable: true }
+        taxPortalExpiry: { type: string, nullable: true }
+        tokenExpiry: { type: string, nullable: true }
+        appealCommitteeDate: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+
+    UpdateClientInput:
+      type: object
+      additionalProperties: false
+      properties:
+        name: { type: string, minLength: 1 }
+        taxNumber: { type: string, nullable: true }
+        entityType: { $ref: "#/components/schemas/EntityType", nullable: true }
+        vatStatus: { $ref: "#/components/schemas/VatStatus", nullable: true }
+        username: { type: string, nullable: true }
+        password: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        phone: { type: string, nullable: true }
+        nationalId: { type: string, nullable: true }
+        eInvoiceEmail: { type: string, nullable: true }
+        eInvoicePassword: { type: string, nullable: true }
+        registrationDate: { type: string, nullable: true }
+        taxCardExpiry: { type: string, nullable: true }
+        taxPortalExpiry: { type: string, nullable: true }
+        tokenExpiry: { type: string, nullable: true }
+        appealCommitteeDate: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+
+    CheckClientDuplicatesInput:
+      type: object
+      additionalProperties: false
+      required: [clients]
+      properties:
+        clients:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [name]
+            properties:
+              name: { type: string }
+              taxNumber: { type: string, nullable: true }
+
+    DuplicateEntry:
+      type: object
+      additionalProperties: false
+      required: [name, reason]
+      properties:
+        name: { type: string }
+        reason: { type: string }
+        inBatch: { type: boolean }
+
+    CheckClientDuplicatesResult:
+      type: object
+      additionalProperties: false
+      required: [duplicates]
+      properties:
+        duplicates:
+          type: array
+          items: { $ref: "#/components/schemas/DuplicateEntry" }
+
+    ImportClientsInput:
+      type: object
+      additionalProperties: false
+      required: [clients]
+      properties:
+        clients:
+          type: array
+          items: { $ref: "#/components/schemas/CreateClientInput" }
+        forceNames:
+          type: array
+          items: { type: string }
+
+    ImportClientsResult:
+      type: object
+      additionalProperties: false
+      required: [inserted, skipped, duplicates]
+      properties:
+        inserted: { type: integer }
+        skipped: { type: integer }
+        duplicates:
+          type: array
+          items: { type: string }
+
+    InvoiceStatus:
+      type: string
+      enum: [معلقة, مدفوعة]
+
+    Invoice:
+      type: object
+      additionalProperties: false
+      required: [id, clientName, amount, status, createdAt]
+      properties:
+        id: { type: integer }
+        clientId: { type: integer, nullable: true }
+        clientName: { type: string }
+        amount: { type: number }
+        status: { $ref: "#/components/schemas/InvoiceStatus" }
+        description: { type: string, nullable: true }
+        addedById: { type: integer, nullable: true }
+        addedByName: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    CreateInvoiceInput:
+      type: object
+      additionalProperties: false
+      required: [clientId, amount, status]
+      properties:
+        clientId: { type: integer }
+        amount: { type: number, minimum: 0 }
+        status: { $ref: "#/components/schemas/InvoiceStatus" }
+        description: { type: string, nullable: true }
+
+    UpdateInvoiceInput:
+      type: object
+      additionalProperties: false
+      properties:
+        amount: { type: number, minimum: 0 }
+        status: { $ref: "#/components/schemas/InvoiceStatus" }
+        description: { type: string, nullable: true }
+
+    ExpenseCategory:
+      type: string
+      enum: [رواتب, ايجار مكتب, كهرباء, انترنت, مصاريف تشغيلية]
+
+    Expense:
+      type: object
+      additionalProperties: false
+      required: [id, item, amount, category, createdAt]
+      properties:
+        id: { type: integer }
+        item: { type: string }
+        amount: { type: number }
+        category: { $ref: "#/components/schemas/ExpenseCategory" }
+        clientId: { type: integer, nullable: true }
+        clientName: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        addedById: { type: integer, nullable: true }
+        addedByName: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    CreateExpenseInput:
+      type: object
+      additionalProperties: false
+      required: [item, amount, category]
+      properties:
+        item: { type: string, minLength: 1 }
+        amount: { type: number, minimum: 0 }
+        category: { $ref: "#/components/schemas/ExpenseCategory" }
+        clientId: { type: integer, nullable: true }
+        notes: { type: string, nullable: true }
+
+    Report:
+      type: object
+      additionalProperties: false
+      required: [id, title, summary, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        period: { type: string, nullable: true }
+        summary: { type: string }
+        addedByName: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    CreateReportInput:
+      type: object
+      additionalProperties: false
+      required: [title, summary]
+      properties:
+        title: { type: string, minLength: 1 }
+        period: { type: string, nullable: true }
+        summary: { type: string, minLength: 1 }
+
+    CommandPriority:
+      type: string
+      enum: [normal, urgent, info]
+
+    Command:
+      type: object
+      additionalProperties: false
+      required: [id, text, priority, target, fromName, createdAt, completed, flagged]
+      properties:
+        id: { type: integer }
+        text: { type: string }
+        priority: { $ref: "#/components/schemas/CommandPriority" }
+        target: { type: string }
+        fromId: { type: integer, nullable: true }
+        fromName: { type: string }
+        flagged: { type: boolean }
+        flaggedAt: { type: string, format: date-time, nullable: true }
+        flaggedById: { type: integer, nullable: true }
+        flaggedByName: { type: string, nullable: true }
+        completed: { type: boolean }
+        completedAt: { type: string, format: date-time, nullable: true }
+        completedById: { type: integer, nullable: true }
+        completedByName: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    CreateCommandInput:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text: { type: string, minLength: 1 }
+        priority: { $ref: "#/components/schemas/CommandPriority" }
+        target: { type: string }
+
+    ToggleCommandCompleteInput:
+      type: object
+      additionalProperties: false
+      required: [completed]
+      properties:
+        completed: { type: boolean }
+
+    ToggleCommandFlagInput:
+      type: object
+      additionalProperties: false
+      required: [flagged]
+      properties:
+        flagged: { type: boolean }
+
+    CommandStatsEntry:
+      type: object
+      additionalProperties: false
+      required: [userId, userName, userColor, total, completed, pending, byMonth, byYear]
+      properties:
+        userId: { type: integer }
+        userName: { type: string }
+        userColor: { type: string }
+        total: { type: integer }
+        completed: { type: integer }
+        pending: { type: integer }
+        byMonth:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [periodKey, periodLabel, total, completed]
+            properties:
+              periodKey: { type: string }
+              periodLabel: { type: string }
+              total: { type: integer }
+              completed: { type: integer }
+        byYear:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [periodKey, periodLabel, total, completed]
+            properties:
+              periodKey: { type: string }
+              periodLabel: { type: string }
+              total: { type: integer }
+              completed: { type: integer }
+
+    CommandStatsResponse:
+      type: array
+      items: { $ref: "#/components/schemas/CommandStatsEntry" }
+
+    DeclarationType:
+      type: string
+      enum: [income, vat]
+
+    Declaration:
+      type: object
+      additionalProperties: false
+      required: [clientId, clientName, type, periodKey, periodLabel, dueDate, completed]
+      properties:
+        clientId: { type: integer }
+        clientName: { type: string }
+        entityType: { $ref: "#/components/schemas/EntityType", nullable: true }
+        vatStatus: { $ref: "#/components/schemas/VatStatus", nullable: true }
+        type: { $ref: "#/components/schemas/DeclarationType" }
+        periodKey: { type: string }
+        periodLabel: { type: string }
+        dueDate: { type: string, format: date }
+        completed: { type: boolean }
+        completedAt: { type: string, format: date-time, nullable: true }
+        completedByName: { type: string, nullable: true }
+
+    ToggleDeclarationInput:
+      type: object
+      additionalProperties: false
+      required: [clientId, type, periodKey, completed]
+      properties:
+        clientId: { type: integer }
+        type: { $ref: "#/components/schemas/DeclarationType" }
+        periodKey: { type: string }
+        completed: { type: boolean }
